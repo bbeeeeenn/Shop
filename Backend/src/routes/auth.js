@@ -1,18 +1,29 @@
 import { Router } from "express";
 import { hash, compare } from "../utilities/hash.js";
-import mongoose from "mongoose";
-import User from "../utilities/models/userModel.js";
+import { User } from "../utilities/models.js";
 
 const router = Router();
 
 // Fetch accounts.
 router.get("/accounts", async (req, res) => {
-	res.send(await User.find());
+	try {
+		res.send(await User.find());
+	} catch (err) {
+		res.send("Something went wrong.");
+	}
 });
 
 // Register
 router.post("/register", async (req, res) => {
-	const { username, password } = req.body;
+	const { username, password, role } = req.body;
+	const allowedRoles = ["admin", "user"];
+
+	// Return if invalid role.
+	if (role) {
+		if (!allowedRoles.includes(role)) {
+			return res.send("Invalid Role.");
+		}
+	}
 
 	// Return if either username or password are undefined.
 	if (!username || !password) {
@@ -43,6 +54,7 @@ router.post("/register", async (req, res) => {
 		const createdAccount = await new User({
 			username: username,
 			password: hash(password),
+			role: role,
 		}).save();
 		res.send("Account Registered.");
 	} catch (err) {
@@ -58,21 +70,31 @@ router.post("/login", async (req, res) => {
 		return res.send("Username and password required.");
 	}
 
-	// Find the account and store in variable.
-	const foundAccount = await User.findOne({ username: username });
+	try {
+		// Find the account and store in variable.
+		const foundAccount = await User.findOne({ username: username });
 
-	// Return if username doesn't exists.
-	if (!foundAccount) {
-		return res.send("Username doesn't exists.");
+		// Return if username doesn't exists.
+		if (!foundAccount) {
+			return res.send("Username doesn't exists.");
+		}
+
+		// Return if invalid password.
+		if (!compare(password, foundAccount.password)) {
+			return res.send("Incorrect password.");
+		}
+
+		// Authorize
+		req.session.user = username;
+		req.session.role = foundAccount.role;
+		// res.send("Logged in");
+		res.json({
+			msg: "Logged in",
+			session: req.session,
+		});
+	} catch (err) {
+		res.send("Something went wrong.");
 	}
-
-	// Return if invalid password.
-	if (!compare(password, foundAccount.password)) {
-		return res.send("Incorrect password.");
-	}
-
-	// Authorize
-	res.send("Logged in");
 });
 
 export default router;

@@ -1,10 +1,14 @@
 import express, { json } from "express";
-import router from "./routes/auth.js";
 import session from "express-session";
 import mongoose from "mongoose";
+import cors from "cors";
+
+import authRoute from "./routes/auth.js";
+import shopRoute from "./routes/shop.js";
 
 const app = express();
 app.use(json());
+app.use(cors());
 app.use(
 	session({
 		secret: "ASDASDASDASDASD",
@@ -13,7 +17,20 @@ app.use(
 	})
 );
 
-app.use("/auth", router);
+// Auth route
+app.use("/auth", authRoute);
+
+// Block if not logged-in
+app.use((req, res, next) => {
+	if (!req.session.user) {
+		return res.send("You are not logged in.");
+	} else {
+		next();
+	}
+});
+
+// Shop route
+app.use("/shop", shopRoute);
 
 // -------------------------
 async function start(PORT = 3000) {
