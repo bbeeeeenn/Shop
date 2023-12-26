@@ -3,6 +3,11 @@ import { Item } from "../utilities/models.js";
 
 const router = Router();
 
+// ---------------------------------------------|
+// ---------------User Routes-------------------|
+// ---------------------------------------------|
+
+// 1. Item List
 router.get("/items", async (req, res) => {
 	try {
 		res.send(await Item.find({}, { __v: 0 }));
@@ -11,7 +16,10 @@ router.get("/items", async (req, res) => {
 	}
 });
 
-// Admin Routes.
+// ---------------------------------------------|
+// ---------------Admin Routes------------------|
+// ---------------------------------------------|
+
 router.use((req, res, next) => {
 	if (req.session.role !== "admin") {
 		return res.send("You are not an admin.");
@@ -19,6 +27,7 @@ router.use((req, res, next) => {
 	next();
 });
 
+// 1. Add Items
 router.post("/admin/add", async (req, res) => {
 	const { name, stocks, price } = req.body;
 	if (!name || !price) {

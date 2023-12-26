@@ -4,7 +4,7 @@ import { User } from "../utilities/models.js";
 
 const router = Router();
 
-// Fetch accounts.
+// 1. Fetch accounts.
 router.get("/accounts", async (req, res) => {
 	try {
 		res.send(await User.find());
@@ -13,17 +13,16 @@ router.get("/accounts", async (req, res) => {
 	}
 });
 
-// Register
+// 2. Register
 router.post("/register", async (req, res) => {
 	const { username, password, role } = req.body;
 	const allowedRoles = ["admin", "user"];
 
 	// Return if invalid role.
-	if (role) {
+	if (role)
 		if (!allowedRoles.includes(role)) {
 			return res.send("Invalid Role.");
 		}
-	}
 
 	// Return if either username or password are undefined.
 	if (!username || !password) {
@@ -62,6 +61,7 @@ router.post("/register", async (req, res) => {
 	}
 });
 
+// 3. Login
 router.post("/login", async (req, res) => {
 	const { username, password } = req.body;
 
@@ -87,11 +87,7 @@ router.post("/login", async (req, res) => {
 		// Authorize
 		req.session.user = username;
 		req.session.role = foundAccount.role;
-		// res.send("Logged in");
-		res.json({
-			msg: "Logged in",
-			session: req.session,
-		});
+		res.send("Logged in");
 	} catch (err) {
 		res.send("Something went wrong.");
 	}
