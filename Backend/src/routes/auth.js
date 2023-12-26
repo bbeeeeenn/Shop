@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { hash, compare } from "../utilities/hash.js";
+import mongoose from "mongoose";
+import User from "../utilities/models/userModel.js";
 
 const router = Router();
 
-let accounts = [];
-
 // Fetch accounts.
 router.get("/accounts", async (req, res) => {
-	res.send(accounts);
+	res.send(await User.find());
 });
 
 // Register
@@ -33,17 +33,21 @@ router.post("/register", async (req, res) => {
 			.send("Username and Password must not be the same.");
 	}
 
-	// Return if username already exists.
-	else if (accounts.some((account) => account.username === username)) {
-		return res.status(403).send("Username already exists.");
-	}
+	try {
+		// Return if username already exists.
+		if (await User.findOne({ username: username })) {
+			return res.status(403).send("Username already exists.");
+		}
 
-	// Register the account
-	accounts.push({
-		username: username,
-		password: hash(password),
-	});
-	res.send("Account Registered.");
+		// Register the account
+		const createdAccount = await new User({
+			username: username,
+			password: hash(password),
+		}).save();
+		res.send("Account Registered.");
+	} catch (err) {
+		res.send("Something went wrong.");
+	}
 });
 
 router.post("/login", async (req, res) => {
@@ -55,9 +59,7 @@ router.post("/login", async (req, res) => {
 	}
 
 	// Find the account and store in variable.
-	const foundAccount = accounts.find(
-		(account) => account.username === username
-	);
+	const foundAccount = await User.findOne({ username: username });
 
 	// Return if username doesn't exists.
 	if (!foundAccount) {
@@ -72,6 +74,5 @@ router.post("/login", async (req, res) => {
 	// Authorize
 	res.send("Logged in");
 });
-
 
 export default router;
