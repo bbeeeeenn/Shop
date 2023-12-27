@@ -46,4 +46,15 @@ router.post("/admin/add", async (req, res) => {
 	}
 });
 
+// 2. Remove Items
+router.delete("/admin/delete/:id", async (req, res) => {
+	const { id } = req.params;
+	try {
+		await Item.findByIdAndDelete(id);
+		res.send("Deleted.");
+	} catch (err) {
+		res.send("Something went wrong.");
+	}
+});
+
 export default router;
