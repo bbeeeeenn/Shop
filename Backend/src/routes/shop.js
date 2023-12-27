@@ -46,7 +46,18 @@ router.post("/admin/add", async (req, res) => {
 	}
 });
 
-// 2. Remove Items
+// 2. Update Items
+router.put("/admin/update/:id", async (req, res) => {
+	const { id } = req.params;
+	try {
+		await Item.findByIdAndUpdate(id, req.body);
+		res.send("Updated.");
+	} catch (err) {
+		res.status(500).send("Something went wrong.");
+	}
+});
+
+// 3. Delete Items
 router.delete("/admin/delete/:id", async (req, res) => {
 	const { id } = req.params;
 	try {
