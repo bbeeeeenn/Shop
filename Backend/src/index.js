@@ -11,7 +11,8 @@ app.use(json());
 app.use(cors());
 app.use(
 	session({
-		secret: "ASDASDASDASDASD",
+		// secret: "ASDASDASDASDASD",
+		secret: ["spaghetti", "zenith", "dio", "senku"],
 		resave: false,
 		saveUninitialized: false,
 	})
