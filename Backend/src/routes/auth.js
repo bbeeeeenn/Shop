@@ -9,7 +9,7 @@ router.get("/accounts", async (req, res) => {
 	try {
 		res.send(await User.find());
 	} catch (err) {
-		res.send("Something went wrong.");
+		res.status(500).send("Something went wrong.");
 	}
 });
 
@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
 	// Return if invalid role.
 	if (role)
 		if (!allowedRoles.includes(role)) {
-			return res.send("Invalid Role.");
+			return res.status(422).send("Invalid Role.");
 		}
 
 	// Return if either username or password are undefined.
@@ -46,7 +46,7 @@ router.post("/register", async (req, res) => {
 	try {
 		// Return if username already exists.
 		if (await User.findOne({ username: username })) {
-			return res.status(403).send("Username already exists.");
+			return res.status(400).send("Username already exists.");
 		}
 
 		// Register the account
@@ -57,7 +57,7 @@ router.post("/register", async (req, res) => {
 		}).save();
 		res.send("Account Registered.");
 	} catch (err) {
-		res.send("Something went wrong.");
+		res.status(500).send("Something went wrong.");
 	}
 });
 
@@ -67,7 +67,7 @@ router.post("/login", async (req, res) => {
 
 	// Return if either username and password are undefined.
 	if (!username || !password) {
-		return res.send("Username and password required.");
+		return res.status(400).send("Username and password required.");
 	}
 
 	try {
@@ -76,12 +76,12 @@ router.post("/login", async (req, res) => {
 
 		// Return if username doesn't exists.
 		if (!foundAccount) {
-			return res.send("Username doesn't exists.");
+			return res.status(404).send("Username doesn't exists.");
 		}
 
 		// Return if invalid password.
 		if (!compare(password, foundAccount.password)) {
-			return res.send("Incorrect password.");
+			return res.status(401).send("Incorrect password.");
 		}
 
 		// Authorize
@@ -89,7 +89,7 @@ router.post("/login", async (req, res) => {
 		req.session.role = foundAccount.role;
 		res.send("Logged in");
 	} catch (err) {
-		res.send("Something went wrong.");
+		res.status(500).send("Something went wrong.");
 	}
 });
 

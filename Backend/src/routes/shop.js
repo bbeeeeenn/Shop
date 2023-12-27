@@ -12,7 +12,7 @@ router.get("/items", async (req, res) => {
 	try {
 		res.send(await Item.find({}, { __v: 0 }));
 	} catch (err) {
-		res.send("Something went wrong.");
+		res.status(500).send("Something went wrong.");
 	}
 });
 
@@ -22,7 +22,7 @@ router.get("/items", async (req, res) => {
 
 router.use((req, res, next) => {
 	if (req.session.role !== "admin") {
-		return res.send("You are not an admin.");
+		return res.status(401).send("You are not an admin.");
 	}
 	next();
 });
@@ -31,7 +31,7 @@ router.use((req, res, next) => {
 router.post("/admin/add", async (req, res) => {
 	const { name, stocks, price } = req.body;
 	if (!name || !price) {
-		return res.sendStatus(400);
+		return res.status(400).send("Name and Price required.");
 	}
 
 	try {
@@ -42,7 +42,7 @@ router.post("/admin/add", async (req, res) => {
 		});
 		res.send("Created.");
 	} catch (err) {
-		res.send("Something went wrong.");
+		res.status(500).send("Something went wrong.");
 	}
 });
 
@@ -53,7 +53,7 @@ router.delete("/admin/delete/:id", async (req, res) => {
 		await Item.findByIdAndDelete(id);
 		res.send("Deleted.");
 	} catch (err) {
-		res.send("Something went wrong.");
+		res.status(500).send("Something went wrong.");
 	}
 });
 
