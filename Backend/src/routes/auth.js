@@ -7,7 +7,7 @@ const router = Router();
 // 1. Fetch accounts.
 router.get("/accounts", async (req, res) => {
 	try {
-		res.send(await User.find());
+		res.send(await User.find({}, { __v: 0 }));
 	} catch (err) {
 		res.status(500).send("Something went wrong.");
 	}

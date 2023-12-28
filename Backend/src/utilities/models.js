@@ -2,26 +2,26 @@ import { Schema, SchemaTypes, model } from "mongoose";
 
 export const User = model(
 	"user",
-	new Schema({
-		username: {
-			type: SchemaTypes.String,
-			required: true,
-			unique: true,
+	new Schema(
+		{
+			username: {
+				type: SchemaTypes.String,
+				required: true,
+				unique: true,
+			},
+			password: {
+				type: SchemaTypes.String,
+				required: true,
+			},
+			role: {
+				type: SchemaTypes.String,
+				default: "user",
+			},
 		},
-		password: {
-			type: SchemaTypes.String,
-			required: true,
-		},
-		role: {
-			type: SchemaTypes.String,
-			default: "user",
-		},
-		created: {
-			type: SchemaTypes.Date,
-			default: Date.now,
-			required: true,
-		},
-	})
+		{
+			timestamps: true,
+		}
+	)
 );
 
 export const Item = model(

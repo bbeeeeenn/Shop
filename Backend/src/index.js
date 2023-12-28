@@ -24,7 +24,7 @@ app.use("/auth", authRoute);
 // Block if not logged-in
 app.use((req, res, next) => {
 	if (!req.session.user) {
-		return res.send("You are not logged in.");
+		return res.status(401).send("You are not logged in.");
 	} else {
 		next();
 	}
